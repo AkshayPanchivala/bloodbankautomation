@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 6.1.1 (Python 3.14.2 on win32)" generated="20260817 22:48:18.562" rpa="false" schemaversion="4">
+<suite id="s1" name="Rpa" source="F:\Projects\blood_bank_management\automation\tests\rpa">
+<suite id="s1-s1" name="Donor Motivation Alert" source="F:\Projects\blood_bank_management\automation\tests\rpa\donor_motivation_alert.robot">
+<test id="s1-s1-t1" name="Check Old Donations And Send Motivation Email" line="9">
+<kw name="Run Process" library="Process">
+<var>${result}</var>
+<arg>venv\\Scripts\\python.exe</arg>
+<arg>resources\\DonorMotivationRpa.py</arg>
+<arg>shell=True</arg>
+<doc>Runs a process and waits for it to complete.</doc>
+<msg timestamp="20260817 22:48:18.605" level="INFO">Starting process:
+venv\Scripts\python.exe resources\DonorMotivationRpa.py</msg>
+<msg timestamp="20260817 22:48:18.632" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20260817 22:48:26.805" level="INFO">Process completed.</msg>
+<msg timestamp="20260817 22:48:26.805" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20260817 22:48:18.605" endtime="20260817 22:48:26.805"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20260817 22:48:26.807" level="INFO">Scanning for Fulfilled donations before 2026-05-19 17:18:19.374738+00:00...
+Found eligible donor: adityamodi.imca22@gmail.com (Last donation: 90 days ago)
+Motivation email successfully sent to adityamodi.imca22@gmail.com
+Process complete. Total motivation emails sent: 1</msg>
+<status status="PASS" starttime="20260817 22:48:26.806" endtime="20260817 22:48:26.807"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20260817 22:48:26.808" level="INFO"/>
+<status status="PASS" starttime="20260817 22:48:26.808" endtime="20260817 22:48:26.808"/>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<arg>msg=RPA Script failed with exit code ${result.rc}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<msg timestamp="20260817 22:48:26.810" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<status status="PASS" starttime="20260817 22:48:26.809" endtime="20260817 22:48:26.810"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Total motivation emails sent:</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20260817 22:48:26.810" endtime="20260817 22:48:26.811"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Found eligible donor: adityamodi.imca22@gmail.com</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20260817 22:48:26.811" endtime="20260817 22:48:26.812"/>
+</kw>
+<doc>Runs the Python RPA script to find donations &gt; 90 days old and send emails.</doc>
+<status status="PASS" starttime="20260817 22:48:18.604" endtime="20260817 22:48:26.812"/>
+</test>
+<doc>RPA script to check for old donations and send motivation emails.</doc>
+<status status="PASS" starttime="20260817 22:48:18.599" endtime="20260817 22:48:26.813"/>
+</suite>
+<suite id="s1-s2" name="Low Stock Email Alert" source="F:\Projects\blood_bank_management\automation\tests\rpa\low_stock_email_alert.robot">
+<test id="s1-s2-t1" name="Check Stock And Send Email Alert" line="12">
+<kw name="Load Email Credentials From Env" library="EmailEnvLoader">
+<var>${email_creds}</var>
+<arg>${ENV_FILE_PATH}</arg>
+<msg timestamp="20260817 22:48:27.127" level="INFO">${email_creds} = {'username': 'akshaypanchivala98@gmail.com', 'password': 'gyribcznjtfltlak', 'host': 'smtp.gmail.com', 'port': 587}</msg>
+<status status="PASS" starttime="20260817 22:48:27.126" endtime="20260817 22:48:27.127"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>Loaded Email Username: ${email_creds['username']}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20260817 22:48:27.127" level="INFO">Loaded Email Username: akshaypanchivala98@gmail.com</msg>
+<status status="PASS" starttime="20260817 22:48:27.127" endtime="20260817 22:48:27.127"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${current_stock}</var>
+<arg>3</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20260817 22:48:27.128" level="INFO">${current_stock} = 3</msg>
+<status status="PASS" starttime="20260817 22:48:27.128" endtime="20260817 22:48:27.128"/>
+</kw>
+<if>
+<branch type="IF" condition="${current_stock} &lt; ${THRESHOLD}">
+<kw name="Log" library="BuiltIn">
+<arg>Stock is low! Sending Email Alert from ${email_creds['username']} to Admin...</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20260817 22:48:27.131" level="INFO">Stock is low! Sending Email Alert from akshaypanchivala98@gmail.com to Admin...</msg>
+<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:27.131"/>
+</kw>
+<kw name="Send Smtp Email" library="EmailEnvLoader">
+<arg>${ENV_FILE_PATH}</arg>
+<arg>akshaypanchivala@gmail.com</arg>
+<arg>URGENT: Low Blood Stock Alert (O-)</arg>
+<arg>Warning! The stock for O- blood has dropped to ${current_stock} units. Please take action immediately.</arg>
+<status status="PASS" starttime="20260817 22:48:27.131" endtime="20260817 22:48:32.197"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>Email successfully sent!</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20260817 22:48:32.198" level="INFO">Email successfully sent!</msg>
+<status status="PASS" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
+</kw>
+<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:32.198"/>
+</branch>
+<branch type="ELSE">
+<kw name="Log" library="BuiltIn">
+<arg>Stock is healthy.</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
+</kw>
+<status status="NOT RUN" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
+</branch>
+<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:32.198"/>
+</if>
+<doc>Checks O- stock and triggers an email if below threshold.</doc>
+<status status="PASS" starttime="20260817 22:48:27.125" endtime="20260817 22:48:32.199"/>
+</test>
+<doc>RPA script to check blood stock and send an email alert if low.</doc>
+<status status="PASS" starttime="20260817 22:48:26.815" endtime="20260817 22:48:32.200"/>
+</suite>
+<status status="PASS" starttime="20260817 22:48:18.564" endtime="20260817 22:48:32.201"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="2" fail="0" skip="0" id="s1" name="Rpa">Rpa</stat>
+<stat pass="1" fail="0" skip="0" id="s1-s1" name="Donor Motivation Alert">Rpa.Donor Motivation Alert</stat>
+<stat pass="1" fail="0" skip="0" id="s1-s2" name="Low Stock Email Alert">Rpa.Low Stock Email Alert</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
