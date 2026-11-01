@@ -1,74 +1,77 @@
 *** Settings ***
-Documentation     UI tests for the User Role workflows.
+Documentation     UI tests for User Role workflows driven from Excel / Google Sheet.
 Library           SeleniumLibrary
+Library           ../../resources/ExcelDataDriver.py
 Resource          ../../resources/ui_keywords.robot
 
 *** Test Cases ***
-Verify User Signup Form Deep Fill
-    [Documentation]    Fills out the entire user signup form with dummy data.
+Verify User Signup Form Driven From Excel Sheet
+    [Documentation]    Reads pending user data from Excel/Google Sheet, fills UI signup form, and marks status Completed.
+    [Tags]             register    signup    user    excel
+    
+    ${record}=    Get Pending Registration Record    role=User
+    
+    IF    ${record} is None
+        Pass Execution    No pending User records found in Excel/Google Sheet. All rows already marked Completed!
+    END
+    
+    Log    Processing Registration from Excel for: ${record['name']} ${record['lastname_or_contact']} (${record['email']})    console=True
+    
     Open Application To    /user/signup
     
-    # Fill standard text fields
-    Input Text    id=firstName    John
-    Input Text    id=lastName     Doe
+    Input Text    id=firstName    ${record['name']}
+    Input Text    id=lastName     ${record['lastname_or_contact']}
     
-    # Select Gender (MUI Radio)
-    Click Element    xpath=//input[@value='Male']
+    ${gender}=    Set Variable If    '${record['gender']}' != '' and '${record['gender']}' != 'None'    ${record['gender']}    Male
+    Click Element    xpath=//input[@value='${gender}']
     
-    Input Text    id=dob          01011990
-    Input Text    id=age          34
-    Input Text    id=phoneNo1     1234567890
-    Input Text    id=phoneNo2     0987654321
+    ${raw_dob}=      Set Variable If    '${record['dob_or_openingdate']}' != '' and '${record['dob_or_openingdate']}' != 'None'    ${record['dob_or_openingdate']}    1990-01-01
+    ${clean_dob}=    Evaluate    str('${raw_dob}').replace('-', '')[:8]
+    Input Text    id=dob          ${clean_dob}
     
-    # Generate a random email so the test doesn't fail on re-run due to unique constraint
-    ${random_num}=    Evaluate    random.randint(1000, 9999)    modules=random
-    Input Text    id=email        johndoe${random_num}@example.com
+    ${age}=          Set Variable If    '${record['age']}' != '' and '${record['age']}' != 'None'    ${record['age']}    30
+    Input Text    id=age          ${age}
     
-    Input Text    id=address      123 Main St
-    Input Text    id=pinCode      123456
+    Input Text    id=phoneNo1     ${record['phone1']}
+    ${phone2}=       Set Variable If    '${record['phone2']}' != '' and '${record['phone2']}' != 'None'    ${record['phone2']}    ${record['phone1']}
+    Input Text    id=phoneNo2     ${phone2}
     
-    Input Text    id=password         Password123_
-    Input Text    id=passwordConfirm  Password123_
+    Input Text    id=email        ${record['email']}
     
-    # Test State and City MUI Dropdowns
-    Select MUI Dropdown    State    MockState
-    Select MUI Dropdown    City     MockCity
+    ${address}=      Set Variable If    '${record['address1']}' != '' and '${record['address1']}' != 'None'    ${record['address1']}    123 Main St
+    Input Text    id=address      ${address}
     
-    # Try to submit the form
-    Click Button       xpath=//button[@type='submit']
+    ${pincode}=      Set Variable If    '${record['pincode']}' != '' and '${record['pincode']}' != 'None'    ${record['pincode']}    123456
+    Input Text    id=pinCode      ${pincode}
     
-    # The submission might fail validation if email exists, 
-    # but the form interaction and dropdowns are successfully tested!
+    Input Text    id=password         ${record['password']}
+    Input Text    id=passwordConfirm  ${record['password']}
+    
+    ${state}=        Set Variable If    '${record['state']}' != '' and '${record['state']}' != 'None'    ${record['state']}    MockState
+    ${city}=         Set Variable If    '${record['city']}' != '' and '${record['city']}' != 'None'    ${record['city']}    MockCity
+    Select MUI Dropdown    State    ${state}
+    Select MUI Dropdown    City     ${city}
+    
+    Click Button    xpath=//button[@type='submit']
     Sleep    2s
     
-    Log    Signup interaction complete
+    Mark Registration Record Completed    row_index=${record['_row_idx']}    file_path=${record['_file_path']}    remarks=Registered successfully via Frontend UI form
+    Log    Updated row ${record['_row_idx']} (${record['email']}) to 'Completed' in Excel sheet!    console=True
 
 Verify User Login Flow
-    [Documentation]    Attempts to login as a user with dummy credentials.
+    [Documentation]    Attempts to login as a user with credentials.
+    [Tags]             login    user
     Login As    user    mockuser@example.com    Password123_
-    
-    # Wait for successful login and dashboard elements to appear
-    # The 'Login As' keyword already verifies that the URL changes from /login/
     Sleep    1s
-    
     Logout
 
 Verify User Want To Donate Flow
     [Documentation]    Tests that a logged in user can access the donate form and select dropdowns.
-    
-    # Login as the mock user that was injected by MockDataSeeder
+    [Tags]             donate    user
     Login As    user    mockuser@example.com    Password123_
-    
-    # Navigate to Want To Donate (which is accessible now that we are logged in)
     Open Application To    /user/wanttodonate
-    
-    # Wait for the table to render
     Wait Until Page Contains    Search Blood Stock    timeout=5s
-    
-    # Test State and City MUI Dropdowns
     Select MUI Dropdown    State    MockState
     Select MUI Dropdown    City     MockCity
-    
     Sleep    2s
-    
     Logout

@@ -1,16 +1,17 @@
 *** Settings ***
-Documentation     RPA script to check for old donations and send motivation emails.
+Documentation     RPA script to check eligible donations from Excel queue or DB and send motivation emails.
 Library           Process
 
 *** Variables ***
 ${PYTHON_CMD}     python
+${RPA_SCRIPT}     ${CURDIR}/../../resources/DonorMotivationRpa.py
 
 *** Test Cases ***
-Check Old Donations And Send Motivation Email
-    [Documentation]    Runs the Python RPA script to find donations > 90 days old and send emails.
+Process Donor Motivation From Excel Queue
+    [Documentation]    Runs the Python RPA script to process eligible donors from the Excel sheet (Pending/Null -> Completed).
     
-    # Run the python script directly using the virtual environment python
-    ${result}=    Run Process    venv\\Scripts\\python.exe    resources\\DonorMotivationRpa.py    shell=True
+    # Run the Python script using the configured python executable
+    ${result}=    Run Process    ${PYTHON_CMD}    ${RPA_SCRIPT}    --excel    --simulate    shell=True
     
     # Log the output for debugging
     Log    ${result.stdout}
@@ -19,8 +20,5 @@ Check Old Donations And Send Motivation Email
     # Verify the script executed successfully
     Should Be Equal As Integers    ${result.rc}    0    msg=RPA Script failed with exit code ${result.rc}
     
-    # Verify that it found at least one eligible donor (we seeded Aditya!)
-    Should Contain    ${result.stdout}    Total motivation emails sent: 
-    
-    # Specifically verify Aditya was found
-    Should Contain    ${result.stdout}    Found eligible donor: adityamodi.imca22@gmail.com
+    # Verify that it processed pending/null records and updated status
+    Should Contain    ${result.stdout}    EXCEL AUTOMATION SUMMARY:

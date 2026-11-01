@@ -9,7 +9,12 @@ ${BROWSER}        Chrome
 *** Keywords ***
 Open Application To
     [Arguments]    ${route}
-    Go To   ${FRONTEND_URL}${route}
+    ${status}=    Run Keyword And Return Status    Get Location
+    IF    not ${status}
+        Open Browser    ${FRONTEND_URL}${route}    ${BROWSER}
+    ELSE
+        Go To    ${FRONTEND_URL}${route}
+    END
     Maximize Browser Window
 
 Login As
@@ -21,6 +26,7 @@ Login As
     Click Button       xpath=//button[@type='submit']
     Wait Until Location Does Not Contain    /login/    timeout=5s
     Sleep              1s
+
 Select MUI Dropdown
     [Arguments]    ${label}    ${value}
     ${dropdown_xpath}=    Set Variable    //label[text()='${label}']/..//div[@role='button']

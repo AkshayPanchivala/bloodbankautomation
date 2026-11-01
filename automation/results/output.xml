@@ -1,136 +1,282 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.1.1 (Python 3.14.2 on win32)" generated="20260817 22:48:18.562" rpa="false" schemaversion="4">
-<suite id="s1" name="Rpa" source="F:\Projects\blood_bank_management\automation\tests\rpa">
-<suite id="s1-s1" name="Donor Motivation Alert" source="F:\Projects\blood_bank_management\automation\tests\rpa\donor_motivation_alert.robot">
-<test id="s1-s1-t1" name="Check Old Donations And Send Motivation Email" line="9">
+<robot generator="Robot 6.1.1 (Python 3.14.2 on win32)" generated="20261101 09:58:12.760" rpa="false" schemaversion="4">
+<suite id="s1" name="Excel Donor Motivation" source="F:\Projects\blood_bank_management\automation\tests\rpa\excel_donor_motivation.robot">
+<kw name="Initialize Python Path" type="SETUP">
+<kw name="Evaluate" library="BuiltIn">
+<var>${py}</var>
+<arg>sys.executable</arg>
+<arg>modules=sys</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<msg timestamp="20261101 09:58:12.813" level="INFO">${py} = F:\Projects\blood_bank_management\automation\venv\Scripts\python.exe</msg>
+<status status="PASS" starttime="20261101 09:58:12.812" endtime="20261101 09:58:12.813"/>
+</kw>
+<kw name="Set Suite Variable" library="BuiltIn">
+<arg>${PYTHON_EXE}</arg>
+<arg>${py}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<msg timestamp="20261101 09:58:12.814" level="INFO">${PYTHON_EXE} = F:\Projects\blood_bank_management\automation\venv\Scripts\python.exe</msg>
+<status status="PASS" starttime="20261101 09:58:12.813" endtime="20261101 09:58:12.814"/>
+</kw>
+<status status="PASS" starttime="20261101 09:58:12.812" endtime="20261101 09:58:12.814"/>
+</kw>
+<test id="s1-t1" name="Reset Excel Queue With Sample Data" line="20">
 <kw name="Run Process" library="Process">
 <var>${result}</var>
-<arg>venv\\Scripts\\python.exe</arg>
-<arg>resources\\DonorMotivationRpa.py</arg>
-<arg>shell=True</arg>
+<arg>${PYTHON_EXE}</arg>
+<arg>${EXCEL_SCRIPT}</arg>
+<arg>--reset-excel</arg>
 <doc>Runs a process and waits for it to complete.</doc>
-<msg timestamp="20260817 22:48:18.605" level="INFO">Starting process:
-venv\Scripts\python.exe resources\DonorMotivationRpa.py</msg>
-<msg timestamp="20260817 22:48:18.632" level="INFO">Waiting for process to complete.</msg>
-<msg timestamp="20260817 22:48:26.805" level="INFO">Process completed.</msg>
-<msg timestamp="20260817 22:48:26.805" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
-<status status="PASS" starttime="20260817 22:48:18.605" endtime="20260817 22:48:26.805"/>
+<msg timestamp="20261101 09:58:12.815" level="INFO">Starting process:
+F:\Projects\blood_bank_management\automation\venv\Scripts\python.exe F:\Projects\blood_bank_management\automation\tests\rpa/../../resources/DonorMotivationRpa.py --reset-excel</msg>
+<msg timestamp="20261101 09:58:12.830" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20261101 09:58:14.218" level="INFO">Process completed.</msg>
+<msg timestamp="20261101 09:58:14.218" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20261101 09:58:12.815" endtime="20261101 09:58:14.218"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${result.stdout}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20260817 22:48:26.807" level="INFO">Scanning for Fulfilled donations before 2026-05-19 17:18:19.374738+00:00...
-Found eligible donor: adityamodi.imca22@gmail.com (Last donation: 90 days ago)
-Motivation email successfully sent to adityamodi.imca22@gmail.com
-Process complete. Total motivation emails sent: 1</msg>
-<status status="PASS" starttime="20260817 22:48:26.806" endtime="20260817 22:48:26.807"/>
+<msg timestamp="20261101 09:58:14.220" level="INFO">Excel queue initialized at: F:\Projects\blood_bank_management\automation\data\donor_motivation_queue.xlsx</msg>
+<status status="PASS" starttime="20261101 09:58:14.219" endtime="20261101 09:58:14.221"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${result.stderr}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20260817 22:48:26.808" level="INFO"/>
-<status status="PASS" starttime="20260817 22:48:26.808" endtime="20260817 22:48:26.808"/>
+<msg timestamp="20261101 09:58:14.222" level="INFO"/>
+<status status="PASS" starttime="20261101 09:58:14.221" endtime="20261101 09:58:14.222"/>
 </kw>
 <kw name="Should Be Equal As Integers" library="BuiltIn">
 <arg>${result.rc}</arg>
 <arg>0</arg>
-<arg>msg=RPA Script failed with exit code ${result.rc}</arg>
+<arg>msg=Failed to reset Excel queue: ${result.stderr}</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<msg timestamp="20260817 22:48:26.810" level="INFO">Argument types are:
+<msg timestamp="20261101 09:58:14.223" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
-<status status="PASS" starttime="20260817 22:48:26.809" endtime="20260817 22:48:26.810"/>
+<status status="PASS" starttime="20261101 09:58:14.222" endtime="20261101 09:58:14.223"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result.stdout}</arg>
-<arg>Total motivation emails sent:</arg>
+<arg>Excel queue initialized</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20260817 22:48:26.810" endtime="20260817 22:48:26.811"/>
+<status status="PASS" starttime="20261101 09:58:14.223" endtime="20261101 09:58:14.224"/>
+</kw>
+<doc>Initializes or resets the Excel sheet with fresh test records (Pending, Null, and Completed).</doc>
+<status status="PASS" starttime="20261101 09:58:12.814" endtime="20261101 09:58:14.224"/>
+</test>
+<test id="s1-t2" name="Process Pending And Null Donors From Excel Sheet" line="28">
+<kw name="Run Process" library="Process">
+<var>${result}</var>
+<arg>${PYTHON_EXE}</arg>
+<arg>${EXCEL_SCRIPT}</arg>
+<arg>--excel</arg>
+<arg>--simulate</arg>
+<doc>Runs a process and waits for it to complete.</doc>
+<msg timestamp="20261101 09:58:14.225" level="INFO">Starting process:
+F:\Projects\blood_bank_management\automation\venv\Scripts\python.exe F:\Projects\blood_bank_management\automation\tests\rpa/../../resources/DonorMotivationRpa.py --excel --simulate</msg>
+<msg timestamp="20261101 09:58:14.243" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20261101 09:58:15.564" level="INFO">Process completed.</msg>
+<msg timestamp="20261101 09:58:15.564" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20261101 09:58:14.225" endtime="20261101 09:58:15.564"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20261101 09:58:15.565" level="INFO">
+[RPA] Starting Excel-driven Donor Motivation Automation...
+[RPA] Excel File: F:\Projects\blood_bank_management\automation\data\donor_motivation_queue.xlsx
+[RPA] Simulation Mode: True
+
+============================================================
+PROCESSING EXCEL AUTOMATION: donor_motivation_queue.xlsx
+Total Rows in Sheet: 5
+============================================================
+
+[Row 2] Match Found -&gt; Status is 'Pending' (Pending/Null)
+        Donor: Aditya Modi | Email: adityamodi.imca22@gmail.com | Days Since: 95
+        [SIMULATION] Simulated sending motivation email to adityamodi.imca22@gmail.com
+        -&gt; STATUS UPDATED TO 'Completed' at 2026-11-01 09:58:15
+
+[Row 3] Match Found -&gt; Status is 'None' (Pending/Null)
+        Donor: John Doe | Email: johndoe_donor@example.com | Days Since: 110
+        [SIMULATION] Simulated sending motivation email to johndoe_donor@example.com
+        -&gt; STATUS UPDATED TO 'Completed' at 2026-11-01 09:58:15
+
+[Row 4] Match Found -&gt; Status is 'null' (Pending/Null)
+        Donor: Rahul Sharma | Email: rahul.sharma@example.com | Days Since: 120
+        [SIMULATION] Simulated sending motivation email to rahul.sharma@example.com
+        -&gt; STATUS UPDATED TO 'Completed' at 2026-11-01 09:58:15
+[Row 5] SKIPPED -&gt; Donor: Already Notified Donor (Status is 'Completed')
+
+[Row 6] Match Found -&gt; Status is 'pending' (Pending/Null)
+        Donor: Priya Patel | Email: priya.patel@example.com | Days Since: 92
+        [SIMULATION] Simulated sending motivation email to priya.patel@example.com
+        -&gt; STATUS UPDATED TO 'Completed' at 2026-11-01 09:58:15
+
+============================================================
+EXCEL AUTOMATION SUMMARY:
+  - Rows Processed &amp; Completed: 4
+  - Rows Skipped (Already Completed): 1
+  - Rows Failed: 0
+  - Updated Excel saved at: F:\Projects\blood_bank_management\automation\data\donor_motivation_queue.xlsx
+============================================================
+</msg>
+<status status="PASS" starttime="20261101 09:58:15.564" endtime="20261101 09:58:15.565"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20261101 09:58:15.565" level="INFO"/>
+<status status="PASS" starttime="20261101 09:58:15.565" endtime="20261101 09:58:15.565"/>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<arg>msg=Excel RPA execution failed: ${result.stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<msg timestamp="20261101 09:58:15.566" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<status status="PASS" starttime="20261101 09:58:15.565" endtime="20261101 09:58:15.566"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result.stdout}</arg>
-<arg>Found eligible donor: adityamodi.imca22@gmail.com</arg>
+<arg>Match Found -&gt; Status is 'Pending'</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20260817 22:48:26.811" endtime="20260817 22:48:26.812"/>
+<status status="PASS" starttime="20261101 09:58:15.566" endtime="20261101 09:58:15.566"/>
 </kw>
-<doc>Runs the Python RPA script to find donations &gt; 90 days old and send emails.</doc>
-<status status="PASS" starttime="20260817 22:48:18.604" endtime="20260817 22:48:26.812"/>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Match Found -&gt; Status is 'None'</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.566" endtime="20261101 09:58:15.567"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Match Found -&gt; Status is 'null'</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.567" endtime="20261101 09:58:15.567"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Match Found -&gt; Status is 'pending'</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.567" endtime="20261101 09:58:15.567"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>SKIPPED -&gt; Donor: Already Notified Donor</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.568" endtime="20261101 09:58:15.568"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>STATUS UPDATED TO 'Completed'</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.568" endtime="20261101 09:58:15.569"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Rows Processed &amp; Completed: 4</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.569" endtime="20261101 09:58:15.569"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Rows Skipped (Already Completed): 1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:15.569" endtime="20261101 09:58:15.570"/>
+</kw>
+<doc>Runs RPA to process ONLY rows with Status 'Pending' or null, and updates them to 'Completed'.</doc>
+<status status="PASS" starttime="20261101 09:58:14.224" endtime="20261101 09:58:15.570"/>
 </test>
-<doc>RPA script to check for old donations and send motivation emails.</doc>
-<status status="PASS" starttime="20260817 22:48:18.599" endtime="20260817 22:48:26.813"/>
-</suite>
-<suite id="s1-s2" name="Low Stock Email Alert" source="F:\Projects\blood_bank_management\automation\tests\rpa\low_stock_email_alert.robot">
-<test id="s1-s2-t1" name="Check Stock And Send Email Alert" line="12">
-<kw name="Load Email Credentials From Env" library="EmailEnvLoader">
-<var>${email_creds}</var>
-<arg>${ENV_FILE_PATH}</arg>
-<msg timestamp="20260817 22:48:27.127" level="INFO">${email_creds} = {'username': 'akshaypanchivala98@gmail.com', 'password': 'gyribcznjtfltlak', 'host': 'smtp.gmail.com', 'port': 587}</msg>
-<status status="PASS" starttime="20260817 22:48:27.126" endtime="20260817 22:48:27.127"/>
+<test id="s1-t3" name="Verify Completed Donors Are Skipped On Re-Execution" line="49">
+<kw name="Run Process" library="Process">
+<var>${result}</var>
+<arg>${PYTHON_EXE}</arg>
+<arg>${EXCEL_SCRIPT}</arg>
+<arg>--excel</arg>
+<arg>--simulate</arg>
+<doc>Runs a process and waits for it to complete.</doc>
+<msg timestamp="20261101 09:58:15.571" level="INFO">Starting process:
+F:\Projects\blood_bank_management\automation\venv\Scripts\python.exe F:\Projects\blood_bank_management\automation\tests\rpa/../../resources/DonorMotivationRpa.py --excel --simulate</msg>
+<msg timestamp="20261101 09:58:15.576" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20261101 09:58:16.946" level="INFO">Process completed.</msg>
+<msg timestamp="20261101 09:58:16.946" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20261101 09:58:15.571" endtime="20261101 09:58:16.947"/>
 </kw>
 <kw name="Log" library="BuiltIn">
-<arg>Loaded Email Username: ${email_creds['username']}</arg>
+<arg>${result.stdout}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20260817 22:48:27.127" level="INFO">Loaded Email Username: akshaypanchivala98@gmail.com</msg>
-<status status="PASS" starttime="20260817 22:48:27.127" endtime="20260817 22:48:27.127"/>
+<msg timestamp="20261101 09:58:16.947" level="INFO">
+[RPA] Starting Excel-driven Donor Motivation Automation...
+[RPA] Excel File: F:\Projects\blood_bank_management\automation\data\donor_motivation_queue.xlsx
+[RPA] Simulation Mode: True
+
+============================================================
+PROCESSING EXCEL AUTOMATION: donor_motivation_queue.xlsx
+Total Rows in Sheet: 5
+============================================================
+[Row 2] SKIPPED -&gt; Donor: Aditya Modi (Status is 'Completed')
+[Row 3] SKIPPED -&gt; Donor: John Doe (Status is 'Completed')
+[Row 4] SKIPPED -&gt; Donor: Rahul Sharma (Status is 'Completed')
+[Row 5] SKIPPED -&gt; Donor: Already Notified Donor (Status is 'Completed')
+[Row 6] SKIPPED -&gt; Donor: Priya Patel (Status is 'Completed')
+
+============================================================
+EXCEL AUTOMATION SUMMARY:
+  - Rows Processed &amp; Completed: 0
+  - Rows Skipped (Already Completed): 5
+  - Rows Failed: 0
+  - Updated Excel saved at: F:\Projects\blood_bank_management\automation\data\donor_motivation_queue.xlsx
+============================================================
+</msg>
+<status status="PASS" starttime="20261101 09:58:16.947" endtime="20261101 09:58:16.947"/>
 </kw>
-<kw name="Set Variable" library="BuiltIn">
-<var>${current_stock}</var>
-<arg>3</arg>
-<doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20260817 22:48:27.128" level="INFO">${current_stock} = 3</msg>
-<status status="PASS" starttime="20260817 22:48:27.128" endtime="20260817 22:48:27.128"/>
-</kw>
-<if>
-<branch type="IF" condition="${current_stock} &lt; ${THRESHOLD}">
 <kw name="Log" library="BuiltIn">
-<arg>Stock is low! Sending Email Alert from ${email_creds['username']} to Admin...</arg>
+<arg>${result.stderr}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20260817 22:48:27.131" level="INFO">Stock is low! Sending Email Alert from akshaypanchivala98@gmail.com to Admin...</msg>
-<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:27.131"/>
+<msg timestamp="20261101 09:58:16.948" level="INFO"/>
+<status status="PASS" starttime="20261101 09:58:16.947" endtime="20261101 09:58:16.948"/>
 </kw>
-<kw name="Send Smtp Email" library="EmailEnvLoader">
-<arg>${ENV_FILE_PATH}</arg>
-<arg>akshaypanchivala@gmail.com</arg>
-<arg>URGENT: Low Blood Stock Alert (O-)</arg>
-<arg>Warning! The stock for O- blood has dropped to ${current_stock} units. Please take action immediately.</arg>
-<status status="PASS" starttime="20260817 22:48:27.131" endtime="20260817 22:48:32.197"/>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<arg>msg=Excel re-execution failed: ${result.stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<msg timestamp="20261101 09:58:16.949" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<status status="PASS" starttime="20261101 09:58:16.948" endtime="20261101 09:58:16.949"/>
 </kw>
-<kw name="Log" library="BuiltIn">
-<arg>Email successfully sent!</arg>
-<doc>Logs the given message with the given level.</doc>
-<msg timestamp="20260817 22:48:32.198" level="INFO">Email successfully sent!</msg>
-<status status="PASS" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Rows Processed &amp; Completed: 0</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:16.949" endtime="20261101 09:58:16.950"/>
 </kw>
-<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:32.198"/>
-</branch>
-<branch type="ELSE">
-<kw name="Log" library="BuiltIn">
-<arg>Stock is healthy.</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="NOT RUN" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result.stdout}</arg>
+<arg>Rows Skipped (Already Completed): 5</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20261101 09:58:16.950" endtime="20261101 09:58:16.951"/>
 </kw>
-<status status="NOT RUN" starttime="20260817 22:48:32.198" endtime="20260817 22:48:32.198"/>
-</branch>
-<status status="PASS" starttime="20260817 22:48:27.129" endtime="20260817 22:48:32.198"/>
-</if>
-<doc>Checks O- stock and triggers an email if below threshold.</doc>
-<status status="PASS" starttime="20260817 22:48:27.125" endtime="20260817 22:48:32.199"/>
+<doc>Running the automation again should skip all rows because all are now marked 'Completed'.</doc>
+<status status="PASS" starttime="20261101 09:58:15.570" endtime="20261101 09:58:16.951"/>
 </test>
-<doc>RPA script to check blood stock and send an email alert if low.</doc>
-<status status="PASS" starttime="20260817 22:48:26.815" endtime="20260817 22:48:32.200"/>
-</suite>
-<status status="PASS" starttime="20260817 22:48:18.564" endtime="20260817 22:48:32.201"/>
+<doc>RPA test suite for Excel-driven Donor Motivation Automation.
+Reads eligible donors from an Excel sheet only if Status is 'Pending' or null/empty.
+Upon completion, updates the Status to 'Completed' in the Excel sheet.</doc>
+<status status="PASS" starttime="20261101 09:58:12.762" endtime="20261101 09:58:16.952"/>
 </suite>
 <statistics>
 <total>
-<stat pass="2" fail="0" skip="0">All Tests</stat>
+<stat pass="3" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat pass="2" fail="0" skip="0" id="s1" name="Rpa">Rpa</stat>
-<stat pass="1" fail="0" skip="0" id="s1-s1" name="Donor Motivation Alert">Rpa.Donor Motivation Alert</stat>
-<stat pass="1" fail="0" skip="0" id="s1-s2" name="Low Stock Email Alert">Rpa.Low Stock Email Alert</stat>
+<stat pass="3" fail="0" skip="0" id="s1" name="Excel Donor Motivation">Excel Donor Motivation</stat>
 </suite>
 </statistics>
 <errors>

@@ -1,14 +1,24 @@
 import os
+import sys
 import pymongo
 from datetime import datetime, timedelta, timezone
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
+# Ensure resources directory is in sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from ExcelHelper import (
+    process_excel_queue, 
+    create_or_reset_donor_excel, 
+    DEFAULT_EXCEL_PATH
+)
+
 def send_motivation_email(email_address, user_name, days_since):
     """Sends a motivation email using SMTP."""
-    # Load credentials from .env
-    load_dotenv()
+    # Load credentials from .env in automation root
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    load_dotenv(dotenv_path=env_path)
     
     email_user = os.getenv("EMAIL_USERNAME")
     email_pass = os.getenv("EMAIL_PASSWORD")
@@ -37,7 +47,7 @@ The Blood Bank Management Team
     msg.set_content(content)
 
     try:
-        with smtplib.SMTP(email_host, int(email_port)) as server:
+        with smtplib.SMTP(email_host, int(email_port), timeout=10) as server:
             server.starttls()
             server.login(email_user, email_pass)
             server.send_message(msg)
@@ -47,12 +57,32 @@ The Blood Bank Management Team
         print(f"Failed to send email to {email_address}: {e}")
         return False
 
+def process_excel_donors(excel_path=DEFAULT_EXCEL_PATH, simulate=False):
+    """
+    RPA Processor that reads donor records from the Excel sheet:
+    - Filters rows where Status is 'Pending' or null/empty.
+    - Sends motivation email.
+    - Upon completion, marks Status as 'Completed' with timestamp and remarks.
+    - Skips already Completed records.
+    - Saves updated Excel sheet.
+    """
+    print(f"\n[RPA] Starting Excel-driven Donor Motivation Automation...")
+    print(f"[RPA] Excel File: {excel_path}")
+    print(f"[RPA] Simulation Mode: {simulate}")
+    
+    stats = process_excel_queue(
+        file_path=excel_path,
+        email_sender_func=send_motivation_email,
+        simulate=simulate
+    )
+    return stats
+
 def check_and_send_motivation_emails():
-    """Scans DB for 3-month old donations and sends emails."""
+    """Scans DB for 3-month old donations and sends emails (Legacy DB mode)."""
     MONGO_URI = "mongodb+srv://akshaypanchivala_db_user:akshaypanchivala_db_user@cluster0.klbtn0r.mongodb.net/blood_bank_management?retryWrites=true&w=majority&appName=Cluster0"
     
     try:
-        client = pymongo.MongoClient(MONGO_URI)
+        client = pymongo.MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
         db = client["blood_bank_management"]
         
         # Calculate the threshold date (90 days ago)
@@ -71,25 +101,17 @@ def check_and_send_motivation_emails():
         for donation in old_donations:
             user_id = donation.get("userId")
             if user_id:
-                # We need to find the user to get their email
                 user = db.users.find_one({"_id": user_id})
                 if user:
                     email = user.get("email")
                     name = user.get("firstName", "Donor")
-                    
-                    # Calculate exact days
                     days_since = (datetime.now(timezone.utc) - donation["createdAt"].replace(tzinfo=timezone.utc)).days
                     
                     print(f"Found eligible donor: {email} (Last donation: {days_since} days ago)")
                     
-                    # Send the email
                     success = send_motivation_email(email, name, days_since)
                     if success:
                         emails_sent += 1
-                        
-                        # Note: In a real system, you would mark a flag like "motivation_sent=True"
-                        # on the user or donation record so you don't spam them every single day.
-                        # For this automation test, we just send it.
                         
         print(f"Process complete. Total motivation emails sent: {emails_sent}")
         return emails_sent
@@ -99,4 +121,13 @@ def check_and_send_motivation_emails():
         return 0
 
 if __name__ == "__main__":
-    check_and_send_motivation_emails()
+    simulate_mode = "--simulate" in sys.argv or os.getenv("RPA_SIMULATE_EMAIL", "false").lower() == "true"
+    
+    if "--reset-excel" in sys.argv:
+        create_or_reset_donor_excel()
+        sys.exit(0)
+    elif "--mongo" in sys.argv:
+        check_and_send_motivation_emails()
+    else:
+        # Default: Run Excel-based RPA
+        process_excel_donors(simulate=simulate_mode)

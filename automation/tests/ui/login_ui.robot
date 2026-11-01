@@ -1,26 +1,32 @@
 *** Settings ***
-Documentation     UI test for the User Login flow.
+Documentation     UI test for User / Admin Login flow driven from Excel or test credentials.
 Library           SeleniumLibrary
+Library           ../../resources/ExcelDataDriver.py
 Resource          ../../resources/ui_keywords.robot
+Test Teardown     Close Browser
 
 *** Variables ***
-${TEST_EMAIL}     test@example.com
-${TEST_PASSWORD}  password123
+${DEFAULT_EMAIL}     mockuser@example.com
+${DEFAULT_PASSWORD}  Password123_
 
 *** Test Cases ***
-User Can Attempt Login
-    [Documentation]    Opens the browser, navigates to user login, inputs credentials, and submits.
-    Open Application To    /login/user
+User Can Attempt Login Driven From Excel
+    [Documentation]    Opens browser, reads credentials from Excel or defaults, inputs credentials, and submits.
+    [Tags]             login    auth    user    excel
     
-    # Wait for the email input to be visible
+    # Try fetching a user record from Excel
+    ${record}=    Get Pending Registration Record    role=User
+    
+    ${email}=       Set Variable If    ${record} is not None and '${record['email']}' != ''    ${record['email']}    ${DEFAULT_EMAIL}
+    ${password}=    Set Variable If    ${record} is not None and '${record['password']}' != ''    ${record['password']}    ${DEFAULT_PASSWORD}
+    
+    Log    Attempting UI login with: ${email}    console=True
+    
+    Open Application To    /login/user
     Wait Until Element Is Visible    id=email    timeout=10s
     
-    # Input credentials
-    Input Text         id=email       ${TEST_EMAIL}
-    Input Text         id=password    ${TEST_PASSWORD}
-    
-    # Click the login button
+    Input Text         id=email       ${email}
+    Input Text         id=password    ${password}
     Click Button       xpath=//button[@type='submit']
     
-    # Wait a moment to observe the action before closing (optional, good for debugging)
     Sleep              2s
